@@ -7,5 +7,6 @@ await rm(target, { recursive: true, force: true });
 await mkdir(resolve(target, 'assets'), { recursive: true });
 await cp(resolve(import.meta.dirname, 'out/assets'), resolve(target, 'assets'), { recursive: true });
 await cp(resolve(import.meta.dirname, 'index.html'), resolve(target, 'index.html'));
-await cp(resolve(import.meta.dirname, 'styles.css'), resolve(target, 'assets/styles.css'));
+await cp(resolve(import.meta.dirname, 'base.css'), resolve(target, 'assets/base.css'));
+await cp(resolve(import.meta.dirname, 'components.css'), resolve(target, 'assets/components.css'));
 console.log(`Built premium UI -> ${target}`);
