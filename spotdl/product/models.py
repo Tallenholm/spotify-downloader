@@ -7,6 +7,19 @@ from pydantic import BaseModel, Field
 
 ContentPreference = Literal["explicit_only", "prefer_explicit", "any"]
 ExplicitStatus = Literal["explicit", "clean", "non_explicit", "mixed_or_unknown"]
+JobState = Literal[
+    "queued",
+    "resolving",
+    "searching",
+    "matched",
+    "downloading",
+    "transcoding",
+    "tagging",
+    "completed",
+    "needs_review",
+    "failed",
+    "cancelled",
+]
 
 
 class CandidateDecision(str, Enum):
@@ -88,3 +101,38 @@ class SearchResponse(BaseModel):
     content_preference: ContentPreference
     albums: List[AlbumEdition] = Field(default_factory=list)
     artists: List[ArtistSummary] = Field(default_factory=list)
+
+
+class DownloadTrackRecord(BaseModel):
+    """Persistent state for one track within a product download job."""
+
+    job_track_id: str
+    job_id: str
+    track_id: str
+    name: str
+    artists: List[str]
+    spotify_url: str
+    explicit: bool
+    position: int
+    state: JobState = "queued"
+    source_url: Optional[str] = None
+    output_path: Optional[str] = None
+    error_code: Optional[str] = None
+    error_message: Optional[str] = None
+
+
+class DownloadJobRecord(BaseModel):
+    """Persistent album/track download job exposed by the product API."""
+
+    job_id: str
+    kind: Literal["album", "track"]
+    source_id: str
+    title: str
+    content_preference: ContentPreference
+    state: JobState = "queued"
+    created_at: str
+    updated_at: str
+    error_code: Optional[str] = None
+    error_message: Optional[str] = None
+    recovery_note: Optional[str] = None
+    tracks: List[DownloadTrackRecord] = Field(default_factory=list)
