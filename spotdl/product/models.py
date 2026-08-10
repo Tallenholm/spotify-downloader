@@ -23,16 +23,12 @@ JobState = Literal[
 
 
 class CandidateDecision(str, Enum):
-    """Decision produced by the explicit-content candidate policy."""
-
     ACCEPT = "accept"
     REJECT = "reject"
     REVIEW = "review"
 
 
 class CandidateAssessment(BaseModel):
-    """Explain whether a provider result satisfies the requested content policy."""
-
     accepted: bool
     decision: CandidateDecision
     reason: str
@@ -40,8 +36,6 @@ class CandidateAssessment(BaseModel):
 
 
 class AlbumTrack(BaseModel):
-    """Track information required by the product UI and queue."""
-
     track_id: str
     name: str
     artists: List[str]
@@ -53,8 +47,6 @@ class AlbumTrack(BaseModel):
 
 
 class AlbumEdition(BaseModel):
-    """One exact Spotify album edition."""
-
     album_id: str
     name: str
     artists: List[str]
@@ -75,8 +67,6 @@ class AlbumEdition(BaseModel):
 
 
 class EditionFamily(BaseModel):
-    """Likely sibling releases of the same album, kept as exact separate IDs."""
-
     family_key: str
     display_name: str
     artist_name: str
@@ -85,8 +75,6 @@ class EditionFamily(BaseModel):
 
 
 class ArtistSummary(BaseModel):
-    """Artist result for discovery views."""
-
     artist_id: str
     name: str
     spotify_url: str
@@ -95,8 +83,6 @@ class ArtistSummary(BaseModel):
 
 
 class SearchResponse(BaseModel):
-    """Versioned discovery response consumed by the React app."""
-
     query: str
     content_preference: ContentPreference
     albums: List[AlbumEdition] = Field(default_factory=list)
@@ -104,8 +90,6 @@ class SearchResponse(BaseModel):
 
 
 class DownloadTrackRecord(BaseModel):
-    """Persistent state for one track within a product download job."""
-
     job_track_id: str
     job_id: str
     track_id: str
@@ -114,6 +98,9 @@ class DownloadTrackRecord(BaseModel):
     spotify_url: str
     explicit: bool
     position: int
+    duration: int = 0
+    track_number: int = 0
+    disc_number: int = 1
     state: JobState = "queued"
     source_url: Optional[str] = None
     output_path: Optional[str] = None
@@ -122,8 +109,6 @@ class DownloadTrackRecord(BaseModel):
 
 
 class DownloadJobRecord(BaseModel):
-    """Persistent album/track download job exposed by the product API."""
-
     job_id: str
     kind: Literal["album", "track"]
     source_id: str
