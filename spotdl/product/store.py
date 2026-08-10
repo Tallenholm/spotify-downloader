@@ -66,6 +66,9 @@ class ProductStore:
                 spotify_url TEXT NOT NULL,
                 explicit INTEGER NOT NULL,
                 position INTEGER NOT NULL,
+                duration INTEGER NOT NULL DEFAULT 0,
+                track_number INTEGER NOT NULL DEFAULT 0,
+                disc_number INTEGER NOT NULL DEFAULT 1,
                 state TEXT NOT NULL,
                 source_url TEXT,
                 output_path TEXT,
@@ -95,7 +98,9 @@ class ProductStore:
         self.connection.commit()
 
     def get_setting(self, key: str, default: Optional[str] = None) -> Optional[str]:
-        row = self.connection.execute("SELECT value FROM settings WHERE key=?", (key,)).fetchone()
+        row = self.connection.execute(
+            "SELECT value FROM settings WHERE key=?", (key,)
+        ).fetchone()
         return str(row["value"]) if row else default
 
     def create_album_job(
@@ -122,7 +127,7 @@ class ProductStore:
             )
             for position, track in enumerate(album.tracks, start=1):
                 self.connection.execute(
-                    "INSERT INTO download_tracks VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    "INSERT INTO download_tracks VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (
                         uuid.uuid4().hex,
                         job_id,
@@ -132,6 +137,9 @@ class ProductStore:
                         track.spotify_url,
                         int(track.explicit),
                         position,
+                        track.duration,
+                        track.track_number,
+                        track.disc_number,
                         "queued",
                         None,
                         None,
@@ -154,6 +162,9 @@ class ProductStore:
             spotify_url=row["spotify_url"],
             explicit=bool(row["explicit"]),
             position=row["position"],
+            duration=row["duration"],
+            track_number=row["track_number"],
+            disc_number=row["disc_number"],
             state=row["state"],
             source_url=row["source_url"],
             output_path=row["output_path"],
@@ -162,7 +173,9 @@ class ProductStore:
         )
 
     def get_job(self, job_id: str) -> Optional[DownloadJobRecord]:
-        row = self.connection.execute("SELECT * FROM download_jobs WHERE job_id=?", (job_id,)).fetchone()
+        row = self.connection.execute(
+            "SELECT * FROM download_jobs WHERE job_id=?", (job_id,)
+        ).fetchone()
         if row is None:
             return None
         track_rows = self.connection.execute(
@@ -187,7 +200,11 @@ class ProductStore:
         rows = self.connection.execute(
             "SELECT job_id FROM download_jobs ORDER BY created_at DESC LIMIT ?", (limit,)
         ).fetchall()
-        return [job for row in rows if (job := self.get_job(row["job_id"])) is not None]
+        return [
+            job
+            for row in rows
+            if (job := self.get_job(row["job_id"])) is not None
+        ]
 
     def update_job_state(
         self,
