@@ -20,6 +20,7 @@ def make_album() -> AlbumEdition:
                 artists=["Example Artist"],
                 duration=200,
                 track_number=1,
+                disc_number=1,
                 explicit=True,
                 spotify_url="https://open.spotify.com/track/track-1",
             ),
@@ -29,6 +30,7 @@ def make_album() -> AlbumEdition:
                 artists=["Example Artist"],
                 duration=180,
                 track_number=2,
+                disc_number=1,
                 explicit=False,
                 spotify_url="https://open.spotify.com/track/track-2",
             ),
@@ -51,6 +53,9 @@ def test_job_survives_store_reopen_with_exact_album_and_preference(tmp_path):
     assert persisted.content_preference == "explicit_only"
     assert persisted.state == "queued"
     assert [track.track_id for track in persisted.tracks] == ["track-1", "track-2"]
+    assert persisted.tracks[0].duration == 200
+    assert persisted.tracks[0].track_number == 1
+    assert persisted.tracks[0].disc_number == 1
 
 
 def test_recover_interrupted_jobs_returns_active_tracks_to_queue(tmp_path):
