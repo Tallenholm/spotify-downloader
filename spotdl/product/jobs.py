@@ -43,14 +43,14 @@ class DownloadJobManager:
             artists=track.artists,
             artist=track.artists[0] if track.artists else "Unknown Artist",
             genres=[],
-            disc_number=1,
-            disc_count=1,
+            disc_number=track.disc_number,
+            disc_count=max((item.disc_number for item in job.tracks), default=1),
             album_name=job.title,
             album_artist=track.artists[0] if track.artists else "Unknown Artist",
-            duration=0,
+            duration=track.duration,
             year=0,
             date="",
-            track_number=track.position,
+            track_number=track.track_number or track.position,
             tracks_count=len(job.tracks),
             song_id=track.track_id,
             explicit=track.explicit,
@@ -80,7 +80,9 @@ class DownloadJobManager:
             if current_job is None or current_job.state == "cancelled":
                 break
             track = next(
-                item for item in current_job.tracks if item.job_track_id == original_track.job_track_id
+                item
+                for item in current_job.tracks
+                if item.job_track_id == original_track.job_track_id
             )
             if track.state == "completed":
                 continue
@@ -131,7 +133,7 @@ class DownloadJobManager:
                         error_code=exc.code,
                         error_message=str(exc),
                     )
-            except Exception as exc:  # product boundary: preserve core exception details
+            except Exception as exc:
                 failed = True
                 self.store.update_track_state(
                     track.job_track_id,
@@ -145,7 +147,9 @@ class DownloadJobManager:
             raise RuntimeError(f"Download job disappeared: {job_id}")
         if final_job.state == "cancelled":
             return final_job
-        if needs_review or any(track.state == "needs_review" for track in final_job.tracks):
+        if needs_review or any(
+            track.state == "needs_review" for track in final_job.tracks
+        ):
             self.store.update_job_state(job_id, "needs_review")
         elif failed or any(track.state == "failed" for track in final_job.tracks):
             self.store.update_job_state(job_id, "failed")
