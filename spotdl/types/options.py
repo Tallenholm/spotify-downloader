@@ -21,9 +21,7 @@ __all__ = [
 
 
 class SpotifyOptions(TypedDict):
-    """
-    Options used for initializing the Spotify client.
-    """
+    """Options used for initializing the Spotify client."""
 
     client_id: str
     client_secret: str
@@ -38,9 +36,7 @@ class SpotifyOptions(TypedDict):
 
 
 class DownloaderOptions(TypedDict):
-    """
-    Options used for initializing the Downloader.
-    """
+    """Options used for initializing the Downloader."""
 
     audio_providers: List[str]
     lyrics_providers: List[str]
@@ -84,6 +80,7 @@ class DownloaderOptions(TypedDict):
     ignore_albums: Optional[List[str]]
     proxy: Optional[str]
     skip_explicit: Optional[bool]
+    content_preference: str
     log_format: Optional[str]
     redownload: Optional[bool]
     skip_album_art: Optional[bool]
@@ -93,9 +90,7 @@ class DownloaderOptions(TypedDict):
 
 
 class WebOptions(TypedDict):
-    """
-    Options used for initializing the Web server.
-    """
+    """Options used for initializing the Web server."""
 
     web_use_output_dir: bool
     port: int
@@ -110,15 +105,11 @@ class WebOptions(TypedDict):
 
 
 class SpotDLOptions(SpotifyOptions, DownloaderOptions, WebOptions):
-    """
-    Options used for initializing the SpotDL client.
-    """
+    """Options used for initializing the SpotDL client."""
 
 
 class SpotifyOptionalOptions(TypedDict, total=False):
-    """
-    Options used for initializing the Spotify client.
-    """
+    """Options used for initializing the Spotify client."""
 
     client_id: str
     client_secret: str
@@ -133,9 +124,7 @@ class SpotifyOptionalOptions(TypedDict, total=False):
 
 
 class DownloaderOptionalOptions(TypedDict, total=False):
-    """
-    Options used for initializing the Downloader.
-    """
+    """Options used for initializing the Downloader."""
 
     audio_providers: List[str]
     lyrics_providers: List[str]
@@ -178,6 +167,7 @@ class DownloaderOptionalOptions(TypedDict, total=False):
     save_errors: Optional[str]
     proxy: Optional[str]
     skip_explicit: Optional[bool]
+    content_preference: str
     log_format: Optional[str]
     redownload: Optional[bool]
     skip_album_art: Optional[bool]
@@ -187,9 +177,7 @@ class DownloaderOptionalOptions(TypedDict, total=False):
 
 
 class WebOptionalOptions(TypedDict, total=False):
-    """
-    Options used for initializing the Web server.
-    """
+    """Options used for initializing the Web server."""
 
     web_use_output_dir: bool
     port: int
@@ -206,7 +194,4 @@ class WebOptionalOptions(TypedDict, total=False):
 class SpotDLOptionalOptions(
     SpotifyOptionalOptions, DownloaderOptionalOptions, WebOptionalOptions
 ):
-    """
-    Options used for initializing the SpotDL client.
-    This type is modified to not require all the fields.
-    """
+    """Options used for initializing the SpotDL client."""
